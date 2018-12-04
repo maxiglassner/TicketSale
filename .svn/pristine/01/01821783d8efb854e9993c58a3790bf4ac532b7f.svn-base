@@ -1,0 +1,7 @@
+package a6;
+
+public enum State {
+	AVAILABLE,
+	RESERVED,
+	SOLD    
+}

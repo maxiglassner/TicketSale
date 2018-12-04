@@ -1,0 +1,144 @@
+package a6;
+
+import java.awt.List;
+
+public class TicketsSale {
+	static Seat[] seats = new Seat[100];
+	static boolean reservations_possible = true;
+
+	public TicketsSale() {
+		for (int i = 0; i < seats.length; i++) {
+			seats[i] = new Seat(i+1);
+		}
+	}
+
+	public static void main(String[] args) {
+		TicketsSale tickets = new TicketsSale();
+		State info = seats[2].state;
+		System.out.println(seats.length);
+	}
+	
+	public static void show_all_Tickets() {
+		int counter = 0;
+		for (int i = 0; i < seats.length; i++) {
+			System.out.print(i+1 + " " + seats[i].state + " | " );					
+			counter ++;
+			if(counter == 10)
+			{
+				System.out.println();
+				counter = 0;
+			}
+		}		
+	}
+
+	public static void sell_free_ticket(int seatnumber) {
+
+		int index = seatnumber - 1;
+		if (index >= 0 && index < 100) {
+			switch (seats[index].state) {
+			case AVAILABLE:
+				seats[index].state = State.SOLD;
+
+				break;
+			case RESERVED:
+				throw new Kartenverkaufexception("Seat already reserved!");
+
+			case SOLD:
+				throw new Kartenverkaufexception("Seat already sold!");
+
+			default:
+				break;
+			}
+
+		} else
+			throw new Kartenverkaufexception("Please insert a correct seat number (1-100)!");
+	}
+
+	public static void reserv_free_Ticket(int seatnumber, String reservation_name) {
+		int index = seatnumber - 1;
+		if (reservations_possible) {
+			if (index >= 0 && index < 100) {
+				switch (seats[index].state) {
+				case AVAILABLE:
+					seats[index].state = State.RESERVED;
+					seats[index].reservation_name = reservation_name;
+					break;
+				case RESERVED:
+					throw new Kartenverkaufexception("Seat already reserved!");
+
+				case SOLD:
+					throw new Kartenverkaufexception("Seat already sold!");
+
+				default:
+					break;
+				}
+			} else
+				throw new Kartenverkaufexception("Please insert a correct seat number (1-100)!");
+
+		} else
+			throw new Kartenverkaufexception("No more reservations possible!");
+
+	}
+
+	public static void sell_reserved_Ticket(int seatnumber, String reservation_name) {
+		int index = seatnumber - 1;
+		if (index >= 0 && index < 100) {
+			switch (seats[index].state) {
+			case AVAILABLE:
+				throw new Kartenverkaufexception("Seat not reserved!");
+
+			case RESERVED:
+				if (reservation_name == seats[index].reservation_name)
+					seats[index].state = State.SOLD;
+				else
+					throw new Kartenverkaufexception("Wrong Reservationname");
+
+				break;
+			case SOLD:
+				throw new Kartenverkaufexception("Seat already sold!");
+
+			default:
+				break;
+			}
+
+		} else
+			throw new Kartenverkaufexception("Please insert a correct seat number (1-100)!");
+
+	}
+
+	public static void cancel_sold_reserv_Ticket(int seatnumber) {
+		int index = seatnumber - 1;
+		if (index >= 0 && index < 100) {
+			switch (seats[index].state) {
+			case AVAILABLE:
+				throw new Kartenverkaufexception("Seat are not reserved/sold!");
+
+			case RESERVED:
+				seats[index].state = State.AVAILABLE;
+				seats[index].reservation_name = null;
+				break;
+			case SOLD:
+				seats[index].state = State.AVAILABLE;
+				break;
+			default:
+				break;
+			}
+
+		} else
+			throw new Kartenverkaufexception("Please insert a correct seat number (1-100)!");
+
+	}
+
+	public static void cancel_all_Reservation() {
+		if (reservations_possible) {
+			reservations_possible = false;
+			for (int i = 0; i < seats.length; i++) {
+				if (seats[i].state == State.RESERVED) {
+					seats[i].state = State.AVAILABLE;
+					seats[i].reservation_name = null;
+				}
+			}
+		} else
+			throw new Kartenverkaufexception("Reservations already canceled!");
+	}
+}
